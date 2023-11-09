@@ -49,7 +49,7 @@ image: https://www.finxit.at/img/profile_full.jpg
 The world's okayest developer
 
 - <carbon-location class="text-blue" /> Linz, Austria
-- 👨‍💻Freelancer
+- 👨‍💻 &nbsp;Freelancer
 - <logos-dotnet /> Developer
 - <logos-mastodon-icon /> [@cschabetsberger@mstdn.social](https://mstdn.social/@cschabetsberger)
 
@@ -496,17 +496,6 @@ layout: fact
 - ⏩ Use .NET High Performance Logging
 - ✅ Use the `LoggerMessage` attribute
 - 🆓 It's free optimization
-
-<v-click>
-
-## Bonus optimization
-
-Activate the [Server Garbage Collection mode](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/workstation-server-gc#server-gc)
-```xml
-<ServerGarbageCollection>true</ServerGarbageCollection>
-```
-
-</v-click>
 
 ---
 layout: center
