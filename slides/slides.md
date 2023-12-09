@@ -337,7 +337,7 @@ layout: fact
 layout: fact
 ---
 
-# Woudldn't it be cool, if...
+# Wouldn't it be cool, if...
 
 ---
 
@@ -414,29 +414,16 @@ public static void Information(
 }
 ```
 
-And then we ➡️
-
----
-layout: center
 ---
 
-# Wait<span v-click>, what the hell are we even doing?</span>
+# However...
 
-<v-click>
+This is not really performant
 
-- `List`s without a capacity?
-- `objects` again?
-- Value type boxing again?
-
-</v-click>
-
----
-
-# We could manually optimize all of that
-
-- Making sure `ILogger.Log` isn't called (by checking the log level before)
-- Allocations of `object[]` representing the parameters are avoided
-- Value type boxing is avoided
+- Allocations of `object[]` again
+- Value type boxing again
+- Making sure `ILogger.Log` isn't called (by checking the log level before) would be needed
+- And propably a lot more
 
 <v-click>
 
@@ -478,14 +465,16 @@ layout: fact
 - ⁉️ Can be used wrong (inline code in string interpolation)
 - ✅ Not logged messages are surprisingly fast
 - ❌ But logged messages are even worse than normal string interpolation
+- ⁉️ Could maybe be used for `LogDebug` / `LogTrace` only
+  - Usually not logged in Production, therefore logged message performance doesn't matter
+  - Would save a lot of boiler plate code (compared to high performance logging)
+  - Is faster in the not logged message scenario, than any default non high performance logging approach
 
 <br />
 
 <v-clicks>
 
 ### __Maybe, don't get to smart with your tooling__
-
-### __And stay performant instead__
 
 </v-clicks>
 
