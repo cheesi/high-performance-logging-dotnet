@@ -23,16 +23,6 @@ title: High Performance Logging in .NET
   </span>
 </div>
 
-<div class="abs-br m-6 flex gap-2">
-  <button @click="$slidev.nav.openInEditor()" title="Open in Editor" class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
-    <carbon:edit />
-  </button>
-  <a href="https://github.com/slidevjs/slidev" target="_blank" alt="GitHub"
-    class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
-    <carbon-logo-github />
-  </a>
-</div>
-
 <style>
 * {
   text-shadow: 2px 2px 4px #000000;
@@ -41,7 +31,7 @@ title: High Performance Logging in .NET
 
 ---
 layout: image-right
-image: https://www.finxit.at/img/profile_full.jpg
+image: /assets/me.png
 ---
 
 # About me
@@ -109,9 +99,9 @@ _logger.LogInformation($"Retailed vehicle with id {vehicleId}.");
 
 <v-clicks>
 
-- A new string is allocated each and every time
-- Strings 🧵 go onto the heap
-- Garbage Collection Time 🗑️🛻⏰
+- A new `string` is allocated each and every time
+- `string`s go onto the **heap**
+- ⚠️ **Garbage Collection** ⚠️
 
 </v-clicks>
 
@@ -156,9 +146,9 @@ public static void LogInformation (
 
 <v-clicks>
 
-- Value types get boxed
-- Boxed types go onto the heap
-- Garbage Collection Time 🗑️🛻⏰
+- Value types get **boxed**
+- Boxed types go onto the **heap**
+- ⚠️ **Garbage Collection** ⚠️
 
 </v-clicks>
 
@@ -176,11 +166,13 @@ And well sometimes strings
 
 ---
 
-# There would even be a warning
+# The warning – that isn't there (by default)
 
 [CA1848: Use the LoggerMessage delegates](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1848)
 
-<code>For improved performance, use the LoggerMessage delegates instead of calling 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'</code>
+<img src="/assets/CA1848.png" />
+
+**For improved performance, use the `LoggerMessage` delegates instead of calling '`LoggerExtensions.LogInformation(ILogger, string?, params object?[])`'**
 
 ❌ __NOT__ activated by default.
 
@@ -212,7 +204,7 @@ That's an awful lot of boiler plate code for logging one line...
 </v-clicks>
 
 <!--
-Also in my opinion it is very hard to ready, there is no clear flow.
+Also, in my opinion it is very hard to ready, there is no clear flow.
 -->
 
 ---
@@ -270,6 +262,50 @@ layout: fact
 ---
 
 # Benchmark
+
+---
+transition: none
+---
+
+# .NET 7 – x64 Windows
+
+| Method                           | Mean       | Error     | StdDev    | Ratio | Gen0   | Allocated |
+|--------------------------------- |-----------:|----------:|----------:|------:|-------:|----------:|
+| InterpolatedString               | 113.383 ns | 0.4008 ns | 0.3749 ns |  3.05 | 0.0181 |     152 B |
+| InterpolatedString_NotLogged     |  99.460 ns | 0.5009 ns | 0.4441 ns |  2.68 | 0.0181 |     152 B |
+| StructuredLogging                |  74.170 ns | 0.8096 ns | 0.7573 ns |  2.00 | 0.0076 |      64 B |
+| StructuredLogging_NotLogged      |  65.368 ns | 0.4894 ns | 0.4578 ns |  1.76 | 0.0076 |      64 B |
+| LoggerMessageDefine              |  38.217 ns | 0.2332 ns | 0.2067 ns |  1.03 |      - |         - |
+| LoggerMessageDefine_NotLogged    |   6.505 ns | 0.0832 ns | 0.0778 ns |  0.18 |      - |         - |
+| LoggerMessageGenerated           |  37.126 ns | 0.1861 ns | 0.1554 ns |  1.00 |      - |         - |
+| LoggerMessageGenerated_NotLogged |   5.280 ns | 0.0483 ns | 0.0452 ns |  0.14 |      - |         - |
+
+<style>
+td {
+  font-size: 0.8rem;
+}
+</style>
+
+---
+
+# .NET 8 – x64 Windows
+
+| Method                           | Mean       | Error     | StdDev    | Ratio | Gen0   | Allocated |
+|--------------------------------- |-----------:|----------:|----------:|------:|-------:|----------:|
+| InterpolatedString               |  84.565 ns | 0.8626 ns | 0.8069 ns |  2.28 | 0.0181 |     152 B |
+| InterpolatedString_NotLogged     |  65.207 ns | 0.9197 ns | 0.8603 ns |  1.76 | 0.0181 |     152 B |
+| StructuredLogging                |  53.898 ns | 0.6485 ns | 0.6066 ns |  1.46 | 0.0076 |      64 B |
+| StructuredLogging_NotLogged      |  45.678 ns | 0.8151 ns | 0.7625 ns |  1.23 | 0.0076 |      64 B |
+| LoggerMessageDefine              |  41.761 ns | 0.1966 ns | 0.1839 ns |  1.13 |      - |         - |
+| LoggerMessageDefine_NotLogged    |   3.698 ns | 0.0310 ns | 0.0290 ns |  0.10 |      - |         - |
+| LoggerMessageGenerated           |  37.014 ns | 0.1358 ns | 0.1271 ns |  1.00 |      - |         - |
+| LoggerMessageGenerated_NotLogged |   3.218 ns | 0.0226 ns | 0.0211 ns |  0.09 |      - |         - |
+
+<style>
+td {
+  font-size: 0.8rem;
+}
+</style>
 
 ---
 
@@ -341,12 +377,13 @@ layout: fact
 
 ---
 
-# we could do string interpolation with structured logging?
+# if we could do string interpolation with structured logging?
 
 <v-clicks>
 
 - ✅ Technology wise - yes
 - ❌ Performance wise - hell no
+  - or maybe?
 
 </v-clicks>
 
@@ -403,7 +440,7 @@ And then we ➡️
 
 ---
 
-# And a new extension method
+# Add a new extension method
 
 ```csharp
 public static void Information(
@@ -460,6 +497,27 @@ layout: fact
 
 ---
 
+# .NET 8 – x64 Windows
+
+| Method                           | Mean       | Error     | StdDev    | Ratio | Gen0   | Allocated |
+|--------------------------------- |-----------:|----------:|----------:|------:|-------:|----------:|
+| InterpolatedString               |  84.565 ns | 0.8626 ns | 0.8069 ns |  2.28 | 0.0181 |     152 B |
+| StructuredLogging                |  53.898 ns | 0.6485 ns | 0.6066 ns |  1.46 | 0.0076 |      64 B |
+| LoggerMessageDefine              |  41.761 ns | 0.1966 ns | 0.1839 ns |  1.13 |      - |         - |
+| LoggerMessageDefine_NotLogged    |   3.698 ns | 0.0310 ns | 0.0290 ns |  0.10 |      - |         - |
+| LoggerMessageGenerated           |  37.014 ns | 0.1358 ns | 0.1271 ns |  1.00 |      - |         - |
+| LoggerMessageGenerated_NotLogged |   3.218 ns | 0.0226 ns | 0.0211 ns |  0.09 |      - |         - |
+| ISLE                             | 110.793 ns | 0.6267 ns | 0.5555 ns |  2.99 | 0.0124 |     104 B |
+| ISLE_NotLogged                   |   3.256 ns | 0.0352 ns | 0.0329 ns |  0.09 |      - |         - |
+
+<style>
+td {
+  font-size: 0.8rem;
+}
+</style>
+
+---
+
 # Conclusion ISLE
 
 - ⁉️ Can be used wrong (inline code in string interpolation)
@@ -468,15 +526,11 @@ layout: fact
 - ⁉️ Could maybe be used for `LogDebug` / `LogTrace` only
   - Usually not logged in Production, therefore logged message performance doesn't matter
   - Would save a lot of boiler plate code (compared to high performance logging)
-  - Is faster in the not logged message scenario, than any default non high performance logging approach
+  - Is faster in the not logged message, than any default non high performance logging approach (x64)
 
-<br />
-
-<v-clicks>
-
-### __Maybe, don't get to smart with your tooling__
-
-</v-clicks>
+<!--
+Maybe don't get to smart with your tooling.
+-->
 
 ---
 
