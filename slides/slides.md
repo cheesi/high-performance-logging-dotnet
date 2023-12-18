@@ -443,11 +443,11 @@ And then we ➡️
 # Add a new extension method
 
 ```csharp
-public static void Information(
+public static void LogInformation(
     this ILogger logger,
     ref StructuredLoggingInterpolatedStringHandler messageTemplate))
 {
-    logger.Information(message.ToString(), message.Parameters);
+    logger.LogInformation(message.ToString(), message.Parameters);
 }
 ```
 
